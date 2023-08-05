@@ -32,6 +32,5 @@ async def predict(input_data: Dict):
 def health():
     return {"status": "ok"}
 
-
 if __name__ == "__main__":
     uvicorn.run(application)

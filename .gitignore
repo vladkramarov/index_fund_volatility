@@ -4,3 +4,5 @@
 /optuna_test
 /studies
 /transformer.py
+**/__pycache__
+**/.DS_Store
