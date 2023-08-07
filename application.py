@@ -21,9 +21,9 @@ async def predict(input_data: Dict):
     else:
         processed_data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
         preds = deployment.predict.predict(processed_data)
-        processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
-        processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = processed_output.to_dict('records')
+        # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
+        # processed_output.replace(np.nan, "N/A", inplace=True)
+        results['results'] = preds[-1].to_dict()
     
     results['errors'] = errors
     return results
