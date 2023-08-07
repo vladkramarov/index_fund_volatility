@@ -12,7 +12,7 @@ def generate_feature_names() -> List[str]:
     return [f'fh_{horizon}' for horizon in range(1, training.config.MAX_PREDICTION_LENGTH + 1)]
 
 class OutputFormatter:
-    def __init__(self, earliest_prediction_date: str, prediction: base_model.Prediction, quantiles: List[float] = training.config.QUANTILES):
+    def __init__(self, earliest_prediction_date: str, prediction: List[str, float], quantiles: List[float] = training.config.QUANTILES):
         self.prediction = prediction
         self.output = self.prediction[0].to('cpu').numpy()
         self.quantiles = quantiles
@@ -63,3 +63,6 @@ class OutputFormatter:
     
 
 
+p = None
+names = ['x', 'y', 'z']
+p[names] = 1
