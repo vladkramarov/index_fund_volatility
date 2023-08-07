@@ -20,10 +20,10 @@ async def predict(input_data: Dict):
         raise HTTPException(status_code=400, detail=errors)
     else:
         processed_data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
-        preds = deployment.predict.predict(processed_data)
+        # preds = deployment.predict.predict(processed_data)
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = processed_data
+        results['results'] = processed_data.to_dict(orient='records')
     
     results['errors'] = errors
     return results
