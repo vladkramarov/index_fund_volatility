@@ -61,8 +61,3 @@ class OutputFormatter:
         self.merge_columns(original_data = original_data)
         return self.final_results
     
-
-
-p = None
-names = ['x', 'y', 'z']
-p[names] = 1
