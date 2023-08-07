@@ -4,7 +4,6 @@ import importlib
 import loader
 import pandas as pd
 import joblib
-from typing import List
 import data_processing.new_data_processor as new_data_processor
 import data_processing.output_formatter as output_formatter
 importlib.reload(core)
@@ -16,7 +15,7 @@ def predict(processed_data: pd.DataFrame):
     preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
     return preds
 
-def process_output(preds: List[str, float], prediction_start_date: str, processed_data: pd.DataFrame) -> pd.DataFrame:
+def process_output(preds, prediction_start_date: str, processed_data: pd.DataFrame) -> pd.DataFrame:
     output_form = output_formatter.OutputFormatter(earliest_prediction_date=prediction_start_date, prediction=preds)
     return output_form.get_unaligned_results(processed_data)
     
