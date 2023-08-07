@@ -19,11 +19,11 @@ async def predict(input_data: Dict):
     if errors is not None:
         raise HTTPException(status_code=400, detail=errors)
     else:
-        # data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
-        # preds = deployment.predict.predict(data)
-        # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], data)
-        # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = input_data #data.to_dict(orient='records')
+        data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
+        preds = deployment.predict.predict(data)
+        processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], data)
+        processed_output.replace(np.nan, "N/A", inplace=True)
+        results['results'] = processed_output.to_dict(orient='records')
     
     results['errors'] = errors
     return results
