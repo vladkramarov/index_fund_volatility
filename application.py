@@ -6,7 +6,6 @@ from typing import Dict, List
 import data_processing.new_data_processor as new_data_processor
 import loader
 import numpy as np
-import json
 application = FastAPI()
 
 @application.get("/")
@@ -18,7 +17,7 @@ async def predict(input_data: Dict):
     input_data, errors = input_validation.validate_inputs(input_data)
     results = {}
     if errors is not None:
-        raise HTTPException(status_code=400, detail=json.loads([errors]))
+        raise HTTPException(status_code=400, detail=errors)
     else:
         processed_data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
         preds = deployment.predict.predict(processed_data)
