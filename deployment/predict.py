@@ -26,3 +26,6 @@ def prediction_pipeline(tickers = ['AAPL', 'MSFT'], prediction_start_date = '202
     return process_output(preds, prediction_start_date, processed_data)
 
 
+data, _ = new_data_processor.new_data_pipeline(tickers = ['AAPL', 'MSFT'], prediction_start_date = '2023-08-03')
+preds = predict(data)
+type(preds[-1])
