@@ -10,7 +10,6 @@ import data_processing.data_formatter as data_formatter
 import importlib
 import datetime as dt
 from pytorch_forecasting import TimeSeriesDataSet
-import data_processing.input_validation as input_validation
 
 importlib.reload(loader)
 
@@ -106,9 +105,4 @@ def get_timeseries_dataset(processed_data: pd.DataFrame):
     return processed_ts_dataset
 
 
-
-
-
-new = NewDataManager(['AAPL'], '2023-08-05')
-processed = new.process_new_data_pipeline()
 

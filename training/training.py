@@ -3,7 +3,7 @@ import numpy as np
 from pytorch_forecasting import TimeSeriesDataSet, TemporalFusionTransformer, GroupNormalizer, QuantileLoss, Baseline, RMSE
 from pytorch_forecasting.metrics import SMAPE, MAPE, MASE, RMSE
 import pandas as pd
-import lightning.pytorch as pl
+import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import training.config
 import data_processing.dataset_and_loaders as dataset_and_loaders
@@ -75,53 +75,57 @@ if __name__ == "__main__":
     test_data = loader.get_test_data()
 
 
-best_model_path = 'lightning_logs/lightning_logs/version_175/checkpoints/epoch=21-step=9526.ckpt'
-best_tft = TemporalFusionTransformer.load_from_checkpoint(best_model_path)
-ts_dataset_params = best_tft.dataset_parameters
 
-preds = best_tft.predict(test_dataset, return_index=True, return_x=True, mode='quantiles')
+# best_tft = TemporalFusionTransformer.load_from_checkpoint(core.BEST_MODEL_PATH)
+# ts_dataset_params = best_tft.dataset_parameters
 
-res = preds.index.copy()
+# trainer = get_trainer()
+# tft = get_tft_model(training_dataset)
+# trainer.fit(tft, train_dataloader, val_dataloader)
+
+# preds = best_tft.predict(test_dataset, return_index=True, return_x=True, mode='quantiles')
+
+# res = preds.index.copy()
 
 
-formatter = output_formatter.OutputFormatter(preds)
-unaligned = formatter.unaligned_results
-unaligned
-q = formatter.format_output_pipeline(test_data)
-non_miss = q.loc[q['fh_10_0.9'].notnull()]
-non_miss['date'] = pd.to_datetime(non_miss['date'])
+# formatter = output_formatter.OutputFormatter(preds)
+# unaligned = formatter.unaligned_results
+# unaligned
+# q = formatter.format_output_pipeline(test_data)
+# non_miss = q.loc[q['fh_10_0.9'].notnull()]
+# non_miss['date'] = pd.to_datetime(non_miss['date'])
 
-def residual_plot(days_ahead: str = 'two', data: pd.DataFrame = non_miss):
-    prediction_feature = f'{days_ahead}_days_ahead'
-    residual = non_miss[prediction_feature] - non_miss[training.config.TARGET]
-    plt.scatter(non_miss[training.config.TARGET], residual)
-    plt.ylabel('Residual')
-    plt.title(f'Residual plot for {days_ahead} days ahead')
-    plt.show()
-residual_plot('two')
+# def residual_plot(days_ahead: str = 'two', data: pd.DataFrame = non_miss):
+#     prediction_feature = f'{days_ahead}_days_ahead'
+#     residual = non_miss[prediction_feature] - non_miss[training.config.TARGET]
+#     plt.scatter(non_miss[training.config.TARGET], residual)
+#     plt.ylabel('Residual')
+#     plt.title(f'Residual plot for {days_ahead} days ahead')
+#     plt.show()
+# residual_plot('two')
 
-def plot_results_over_time(days_ahead: int = 1, data: pd.DataFrame = non_miss):
+# def plot_results_over_time(days_ahead: int = 1, data: pd.DataFrame = non_miss):
     
-    prediction_feature = f'fh_{days_ahead}_0.5'
-    lower_limit = f'fh_{days_ahead}_0.1'
-    upper_limit = f'fh_{days_ahead}_0.9'
-    fig, ax = plt.subplots(4, 2, figsize=(15, 8))
-    #plot results for each ticker in a separate subplot
-    for i, ticker in enumerate(data['ticker'].unique()):
-        ticker_data = data.loc[data['ticker'] == ticker]
-        sns.lineplot(data=ticker_data, x='date', y=prediction_feature, ax=ax[i//2][i%2], legend='brief', label='prediction')
-        #fill between the quantiles
-        ax[i//2][i%2].fill_between(ticker_data['date'], ticker_data[lower_limit], ticker_data[upper_limit], alpha=0.3, label='0.1-0.9 quantile')
-        sns.lineplot(data=ticker_data, x='date', y=training.config.TARGET, ax=ax[i//2][i%2])
-        ax[i//2][i%2].set_title(f'{ticker} {days_ahead} days ahead')
+#     prediction_feature = f'fh_{days_ahead}_0.5'
+#     lower_limit = f'fh_{days_ahead}_0.1'
+#     upper_limit = f'fh_{days_ahead}_0.9'
+#     fig, ax = plt.subplots(4, 2, figsize=(15, 8))
+#     #plot results for each ticker in a separate subplot
+#     for i, ticker in enumerate(data['ticker'].unique()):
+#         ticker_data = data.loc[data['ticker'] == ticker]
+#         sns.lineplot(data=ticker_data, x='date', y=prediction_feature, ax=ax[i//2][i%2], legend='brief', label='prediction')
+#         #fill between the quantiles
+#         ax[i//2][i%2].fill_between(ticker_data['date'], ticker_data[lower_limit], ticker_data[upper_limit], alpha=0.3, label='0.1-0.9 quantile')
+#         sns.lineplot(data=ticker_data, x='date', y=training.config.TARGET, ax=ax[i//2][i%2])
+#         ax[i//2][i%2].set_title(f'{ticker} {days_ahead} days ahead')
 
-        ax[i//2][i%2].xaxis.set_major_locator(mdates.DayLocator(interval=90))
-    fig.tight_layout()
-    plt.show()
+#         ax[i//2][i%2].xaxis.set_major_locator(mdates.DayLocator(interval=90))
+#     fig.tight_layout()
+#     plt.show()
 
-plot_results_over_time(1)
+# plot_results_over_time(1)
 
-test_df = loader.get_test_data()
+# test_df = loader.get_test_data()
 
 
 

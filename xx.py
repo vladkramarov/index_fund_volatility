@@ -1,9 +1,17 @@
-import requests
+# from fastapi import FastAPI, HTTPException
+# import deployment.predict 
+# import uvicorn
+# import data_processing.input_validation as input_validation
+# from typing import Dict, List
+# import data_processing.new_data_processor as new_data_processor
+# import loader
+# import numpy as np
 
-url = "https://api.openaq.org/v2/cities?limit=100&page=1&country=US&city=Houston&order_by=city"
+# processed, _ = new_data_processor.new_data_pipeline(tickers = ['AAPL', 'MSFT'], prediction_start_date = '2023-08-03')
+# preds = deployment.predict.predict(processed)
 
-headers = {"accept": "application/json"}
+# model = loader.get_model()
+# preds_new = model.predict(processed, return_index=True, return_x=True, mode='quantiles')
 
-response = requests.get(url, headers=headers)
-
-print(response.text)
+# output = deployment.predict.process_output(preds, '2023-08-03', processed)
+# output.replace(np.nan, "N/A", inplace=True)

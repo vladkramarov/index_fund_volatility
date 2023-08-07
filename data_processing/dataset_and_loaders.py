@@ -12,7 +12,6 @@ importlib.reload(training.config)
 import data_processing.data_formatter as data_formatter
 
 
-
 def get_timeseries_datasets():
     train = loader.get_data_for_training()
     train = data_formatter.persist_column_type(train)

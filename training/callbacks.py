@@ -1,5 +1,5 @@
-from lightning.pytorch.callbacks import EarlyStopping, LearningRateMonitor, ModelCheckpoint
-from lightning.pytorch.loggers import TensorBoardLogger
+from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, ModelCheckpoint
+from pytorch_lightning.loggers import TensorBoardLogger
 
 def get_callbacks():
     early_stop_callback = EarlyStopping(
