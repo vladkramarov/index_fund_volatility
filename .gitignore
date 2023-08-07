@@ -1,7 +1,7 @@
-/data*
 !data/nasdaq_schedule.csv
 !data/earnings.csv
 !data/cpi.csv
+data/*
 /lightning_logs
 /garch
 /optuna_test
