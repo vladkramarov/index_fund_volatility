@@ -60,10 +60,7 @@ async def predict_new(input_data: Dict):
     output = preds[0].to('cpu').detach().numpy()
     logger.info(f'Output shape: {output.shape}')
     logger.info(f'Output type: {type(output)}')
-    output = output.reshape(output.shape[0], -1)
-    final = preds.index
-    cols = [f'q_{i}' for i in range(1, output.shape[1] + 1)]
-    final[cols] = output
-    final.replace(np.nan, "N/A", inplace=True)
-    results['results'] = final.to_dict(orient='records')
+    formatter = output_formatter.OutputFormatter(earliest_prediction_date='2023-07-25', prediction=preds)
+    final = formatter.get_unaligned_results(processed_data)
+    results['results'] = final.replace(np.nan, "N/A", inplace=True).to_dict(orient='records')
     return results
