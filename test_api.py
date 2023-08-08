@@ -25,3 +25,12 @@ formatted = output.get_unaligned_results(new_data)
 str(pd.DataFrame(preds[-1]).to_dict(orient='records'))
 q = results.json()
 dict(q['results'])
+
+q = preds[0]
+q.shape
+final = preds[-1]
+quant = [0.1, 0.5, 0.9]
+
+q[:, :, ].shape
+for position, quantile in enumerate(quant):
+    quantile_preds = preds[:, :, position]

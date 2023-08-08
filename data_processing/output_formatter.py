@@ -23,8 +23,8 @@ class OutputFormatter:
             self.unaligned_results = self.prediction[-1]
             self.output = self.prediction[0].to('cpu').detach().numpy()
         else:
-            self.unaligned_results = self.prediction[0].to('cpu').numpy()
-            self.output = self.prediction.index.copy()
+            self.unaligned_results = self.prediction.index.copy()
+            self.output = self.prediction[0].to('cpu').numpy()
 
         
     def _process_results(self) -> pd.DataFrame:
