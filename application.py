@@ -26,7 +26,7 @@ async def predict(input_data: Dict):
         preds = model.predict(processed_data, return_index=True, return_x=True, mode='quantiles')
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = preds[-1].to_dict(orient='records')
+        results['results'] = preds
     
     results['errors'] = errors
     return results
