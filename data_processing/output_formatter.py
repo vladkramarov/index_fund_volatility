@@ -42,7 +42,6 @@ class OutputFormatter:
         return self.unaligned_results
     
     def get_unaligned_results(self, original_data: pd.DataFrame) -> pd.DataFrame:
-        self.unaligned_results = self.prediction[-1]
         self._process_results()
         self.unaligned_results = pd.merge(self.unaligned_results, original_data[['ticker', 'idx', 'date']], on = ['ticker', 'idx'], how = 'left')
         self.unaligned_results = self.unaligned_results.loc[self.unaligned_results['date'] >= self.earliest_prediction_date]
