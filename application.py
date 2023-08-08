@@ -55,6 +55,7 @@ async def predict_new(input_data: Dict):
     ts_dataset_params = loader.get_timeseries_params()
     ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
     preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
+    q = pd.DataFrame(preds[-1]).to_dict(orient='records')
     results = {}
-    results['results'] = str(preds)
+    results['results'] = q
     return results
