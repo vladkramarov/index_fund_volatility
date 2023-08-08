@@ -55,7 +55,6 @@ async def predict_new(input_data: Dict):
     ts_dataset_params = loader.get_timeseries_params()
     ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
     preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
-    output = preds[-1].replace(np.nan, "N/A", inplace=True).to_dict()
     results = {}
-    results['results'] = output
+    results['results'] = preds
     return results

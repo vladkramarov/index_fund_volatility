@@ -8,8 +8,10 @@ local_host = 'http://pytorch-final-env.eba-zbppsjpu.us-east-1.elasticbeanstalk.c
 # input_data = {'tickers': ['AAPL'], 'prediction_start_date': '2023-07-25'}
 
 new_data, _ = new_data_processor.new_data_pipeline(tickers = ['AAPL'], prediction_start_date = '2023-07-25')
+new_data['date'] = new_data['date'].astype(str)
 data = {'processed_data': new_data.to_dict(orient='records')}
 
+data['processed_data']
 results = requests.post(local_host + '/predict_new', json=data)
 
 print(results.json())
