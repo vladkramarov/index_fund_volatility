@@ -30,6 +30,7 @@ async def predict(input_data: Dict):
         ts_dataset_params = loader.get_timeseries_params()
         ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
         start_time = time.time()
+        preds = None
         try:
             preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
         except Exception as e:
