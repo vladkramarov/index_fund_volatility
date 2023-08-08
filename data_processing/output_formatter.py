@@ -26,7 +26,6 @@ class OutputFormatter:
             self.unaligned_results = self.prediction[0].to('cpu').numpy()
             self.output = self.prediction.index.copy()
 
-        self.unaligned_results = self.unaligned_results.reshape(self.unaligned_results.shape[0], -1) # flatten the output
         
     def _process_results(self) -> pd.DataFrame:
         if self.quantiles:
