@@ -37,11 +37,11 @@ async def predict(input_data: Dict):
             logger.exception("Error during prediction")
 
         end_time = time.time()
-
+        output = preds[-1].replace(np.nan, "N/A", inplace=True).to_dict()
         logger.info(f"Model prediction took {end_time - start_time} seconds")
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = preds[-1].to_dict()
+        results['results'] = output
     
     results['errors'] = errors
     return results
