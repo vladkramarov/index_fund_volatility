@@ -14,12 +14,19 @@ def generate_feature_names() -> List[str]:
 class OutputFormatter:
     def __init__(self, earliest_prediction_date: str, prediction, quantiles: List[float] = training.config.QUANTILES):
         self.prediction = prediction
-        self.output = self.prediction[0].to('cpu').numpy()
         self.quantiles = quantiles
         self.quantile_results = {}
-        self.unaligned_results = self.prediction[-1]
         self.generic_feature_names = generate_feature_names()
         self.earliest_prediction_date = earliest_prediction_date
+        
+        if isinstance(self.prediction, list):
+            self.unaligned_results = self.prediction[-1]
+            self.output = self.prediction[0].to('cpu').numpy()
+        else:
+            self.unaligned_results = self.prediction.output[0].to('cpu').numpy()
+            self.output = self.prediction.index.copy()
+        
+        
     def _process_results(self) -> pd.DataFrame:
         if self.quantiles:
             for position, quantile in enumerate(self.quantiles):

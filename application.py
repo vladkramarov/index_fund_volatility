@@ -9,6 +9,7 @@ import pandas as pd
 import logging
 from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
 import time
+import data_processing.output_formatter as output_formatter
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,10 +55,9 @@ async def predict_new(input_data: Dict):
     model = loader.get_model()
     ts_dataset_params = loader.get_timeseries_params()
     ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
-    preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
-    output = preds.index
-    logger.info(f"Prediction type: {type(output)}")
-    q = output.to_dict(orient='records')
     results = {}
-    results['results'] = q
+    preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
+    output = output_formatter.OutputFormatter(earliest_prediction_date='2023-07-25', prediction=preds)
+    formatted = output.get_unaligned_results(processed_data)
+    results['results'] = formatted.to_dict(orient='records')
     return results
