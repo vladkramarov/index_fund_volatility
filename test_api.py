@@ -8,3 +8,4 @@ input_data = {'tickers': ['AAPL'], 'prediction_start_date': '2023-08-07'}
 
 results = requests.post(local_host + '/predict', json=input_data)
 
+print(results.json())
