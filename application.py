@@ -5,6 +5,7 @@ from typing import Dict, List
 import data_processing.new_data_processor as new_data_processor
 import loader
 import numpy as np
+import pandas as pd
 import logging
 from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
 import time
@@ -49,7 +50,7 @@ def read_root():
 
 @application.post("/predict_new")
 async def predict_new(input_data: Dict):
-    processed_data = input_data['processed_data']
+    processed_data = pd.DataFrame(input_data['processed_data'])
     model = loader.get_model()
     ts_dataset_params = loader.get_timeseries_params()
     ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
