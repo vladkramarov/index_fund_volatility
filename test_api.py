@@ -11,7 +11,7 @@ new_data, _ = new_data_processor.new_data_pipeline(tickers = ['AAPL'], predictio
 new_data['date'] = new_data['date'].astype(str)
 data = {'processed_data': new_data.to_dict(orient='records')}
 
-data['processed_data']
 results = requests.post(local_host + '/predict_new', json=data)
 
 print(results.json())
+str(None)
