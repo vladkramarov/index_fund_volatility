@@ -63,5 +63,6 @@ async def predict_new(input_data: Dict):
     logger.info(f'Index type: {type(index)}')
     formatter = output_formatter.OutputFormatter(earliest_prediction_date='2023-07-25', prediction=preds)
     final = formatter.get_unaligned_results(processed_data)
-    results['results'] = final.replace(np.nan, "N/A", inplace=True).to_dict(orient='records')
+    final.replace(np.nan, "N/A", inplace=True)
+    results['results'] = final.to_dict(orient='records')
     return results
