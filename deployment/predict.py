@@ -25,7 +25,3 @@ def prediction_pipeline(tickers = ['AAPL', 'MSFT'], prediction_start_date = '202
     preds = predict(processed_data)
     return process_output(preds, prediction_start_date, processed_data)
 
-
-new, _ = new_data_processor.new_data_pipeline(tickers = ['AAPL', 'MSFT'], prediction_start_date = '2023-08-03')
-preds, ts = predict(new)
-ts.decoded_index
