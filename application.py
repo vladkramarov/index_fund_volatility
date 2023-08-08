@@ -23,7 +23,7 @@ async def predict(input_data: Dict):
         model = loader.get_model()
         ts_dataset_params = loader.get_timeseries_params()
         ts_dataset = deployment.predict.TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
-        preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
+        preds = model.predict(processed_data, return_index=True, return_x=True, mode='quantiles')
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
         results['results'] = preds[-1].to_dict(orient='records')
