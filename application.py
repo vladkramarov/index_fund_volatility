@@ -20,10 +20,12 @@ async def predict(input_data: Dict):
         raise HTTPException(status_code=400, detail=errors)
     else:
         processed_data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
-        preds = deployment.predict.predict(processed_data)
+        model = loader.get_model()
+        ts_dataset_params = loader.get_timeseries_params()
+        ts_dataset = deployment.predict.TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = preds[-1].to_dict(orient='records')
+        results['results'] = processed_data[-1].to_dict(orient='records')
     
     results['errors'] = errors
     return results
