@@ -7,3 +7,4 @@ local_host = 'http://pytorch-final-env.eba-zbppsjpu.us-east-1.elasticbeanstalk.c
 input_data = {'tickers': ['AAPL'], 'prediction_start_date': '2023-08-07'}
 
 results = requests.post(local_host + '/predict', json=input_data)
+
