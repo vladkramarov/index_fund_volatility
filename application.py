@@ -6,6 +6,11 @@ from typing import Dict, List
 import data_processing.new_data_processor as new_data_processor
 import loader
 import numpy as np
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 application = FastAPI()
 
 @application.get("/")
@@ -23,7 +28,10 @@ async def predict(input_data: Dict):
         model = loader.get_model()
         ts_dataset_params = loader.get_timeseries_params()
         ts_dataset = deployment.predict.TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
-        preds = model.predict(processed_data, return_index=True, return_x=True, mode='quantiles')
+        try:
+            preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
+        except Exception as e:
+            logger.exception("Error during prediction")
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
         results['results'] = preds
