@@ -25,7 +25,7 @@ async def predict(input_data: Dict):
         ts_dataset = deployment.predict.TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = processed_data[-1].to_dict(orient='records')
+        results['results'] = processed_data.to_dict(orient='records')
     
     results['errors'] = errors
     return results
