@@ -40,7 +40,7 @@ async def predict(input_data: Dict):
         logger.info(f"Model prediction took {end_time - start_time} seconds")
         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = preds[-1].to_dict(orient='records')
+        results['results'] = ts_dataset.decoded_index.to_dict(orient='records')
     
     results['errors'] = errors
     return results
