@@ -58,9 +58,12 @@ async def predict_new(input_data: Dict):
     results = {}
     preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
     output = preds[0].to('cpu').detach().numpy()
+    logger.info(f'Output shape: {output.shape}')
+    logger.info(f'Output type: {type(output)}')
     output = output.reshape(output.shape[0], -1)
-    final = preds.index.copy()
-    cols = [f'q_{i}' for i in range(1, 30+1)]
+    final = preds.index
+    cols = [f'q_{i}' for i in range(1, output.shape[1] + 1)]
     final[cols] = output
-    results['results'] = final.replace(np.nan, "N/A", inplace=True).to_dict()
+    final.replace(np.nan, "N/A", inplace=True)
+    results['results'] = final.to_dict(orient='records')
     return results
