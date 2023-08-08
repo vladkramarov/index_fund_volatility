@@ -18,13 +18,14 @@ class OutputFormatter:
         self.quantile_results = {}
         self.generic_feature_names = generate_feature_names()
         self.earliest_prediction_date = earliest_prediction_date
-
-        if isinstance(self.prediction, list):
-            self.unaligned_results = self.prediction[-1]
-            self.output = self.prediction[0].to('cpu').detach().numpy()
-        else:
-            self.unaligned_results = self.prediction.index.copy()
-            self.output = self.prediction[0].to('cpu').numpy()
+        self.unaligned_results = self.prediction.index.copy()
+        self.output = self.prediction[0].numpy()
+        # if isinstance(self.prediction, list):
+        #     self.unaligned_results = self.prediction[-1]
+        #     self.output = self.prediction[0].to('cpu').detach().numpy()
+        # else:
+        #     self.unaligned_results = self.prediction.index.copy()
+        #     self.output = self.prediction[0].numpy()
 
         
     def _process_results(self) -> pd.DataFrame:
