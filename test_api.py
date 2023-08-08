@@ -13,11 +13,12 @@ new_data['date'] = new_data['date'].astype(str)
 data = {'processed_data': new_data.to_dict(orient='records')}
 
 results = requests.post(local_host + '/predict_new', json=data)
+print(results.content)
 
 ts_dataset_params = loader.get_timeseries_params()
 ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, new_data, predict=False)
 model = loader.get_model()
 preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
-pd.DataFrame(preds[-1]).to_dict(orient='records')
+str(pd.DataFrame(preds[-1]).to_dict(orient='records'))
 q = results.json()
 dict(q['results'])
