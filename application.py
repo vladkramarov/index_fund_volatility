@@ -18,43 +18,43 @@ application = FastAPI()
 def read_root():
     return {"Hello": "World"}
 
-@application.post("/predict")
-async def predict(input_data: Dict):
-    input_data, errors = input_validation.validate_inputs(input_data)
-    results = {}
-    if errors is not None:
-        raise HTTPException(status_code=400, detail=errors)
-    else:
-        processed_data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
-        logger.info(f'Processed data: {processed_data.head()}')
-        model = loader.get_model()
-        ts_dataset_params = loader.get_timeseries_params()
-        ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
-        start_time = time.time()
-        preds = None
-        try:
-            preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
-        except Exception as e:
-            logger.exception("Error during prediction")
-
-        end_time = time.time()
-        output = preds[-1].replace(np.nan, "N/A", inplace=True).to_dict()
-        logger.info(f"Model prediction took {end_time - start_time} seconds")
-        # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
-        # processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = output
-    
-    results['errors'] = errors
-    return results
-
-# @application.post("/predict_new")
-# async def predict_new(input_data: Dict):
-#     processed_data = input_data['processed_data']
-#     model = loader.get_model()
-#     ts_dataset_params = loader.get_timeseries_params()
-#     ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
-#     preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
-#     output = preds[-1].replace(np.nan, "N/A", inplace=True).to_dict()
+# @application.post("/predict")
+# async def predict(input_data: Dict):
+#     input_data, errors = input_validation.validate_inputs(input_data)
 #     results = {}
-#     results['results'] = output
+#     if errors is not None:
+#         raise HTTPException(status_code=400, detail=errors)
+#     else:
+#         processed_data, _ = new_data_processor.new_data_pipeline(tickers = input_data['tickers'], prediction_start_date = input_data['prediction_start_date'])
+#         logger.info(f'Processed data: {processed_data.head()}')
+#         model = loader.get_model()
+#         ts_dataset_params = loader.get_timeseries_params()
+#         ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
+#         start_time = time.time()
+#         preds = None
+#         try:
+#             preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
+#         except Exception as e:
+#             logger.exception("Error during prediction")
+
+#         end_time = time.time()
+#         output = preds[-1].replace(np.nan, "N/A", inplace=True).to_dict()
+#         logger.info(f"Model prediction took {end_time - start_time} seconds")
+#         # processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
+#         # processed_output.replace(np.nan, "N/A", inplace=True)
+#         results['results'] = output
+    
+#     results['errors'] = errors
 #     return results
+
+@application.post("/predict_new")
+async def predict_new(input_data: Dict):
+    processed_data = input_data['processed_data']
+    model = loader.get_model()
+    ts_dataset_params = loader.get_timeseries_params()
+    ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
+    preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
+    output = preds[-1].replace(np.nan, "N/A", inplace=True).to_dict()
+    results = {}
+    results['results'] = output
+    return results
