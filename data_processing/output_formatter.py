@@ -19,7 +19,7 @@ class OutputFormatter:
         self.generic_feature_names = generate_feature_names()
         self.earliest_prediction_date = earliest_prediction_date
         self.unaligned_results = self.prediction.index.copy()
-        self.output = self.prediction[0].numpy()
+        self.output = self.prediction[0].to('cpu').detach().numpy()
         # if isinstance(self.prediction, list):
         #     self.unaligned_results = self.prediction[-1]
         #     self.output = self.prediction[0].to('cpu').detach().numpy()

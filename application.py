@@ -57,9 +57,10 @@ async def predict_new(input_data: Dict):
     ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
     results = {}
     preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
+    index = preds.index
     output = preds[0].to('cpu').detach().numpy()
-    logger.info(f'Output shape: {output.shape}')
-    logger.info(f'Output type: {type(output)}')
+    logger.info(f'Index shape: {index.shape}')
+    logger.info(f'Index type: {type(index)}')
     formatter = output_formatter.OutputFormatter(earliest_prediction_date='2023-07-25', prediction=preds)
     final = formatter.get_unaligned_results(processed_data)
     results['results'] = final.replace(np.nan, "N/A", inplace=True).to_dict(orient='records')
