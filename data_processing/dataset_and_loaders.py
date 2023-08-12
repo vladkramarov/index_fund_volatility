@@ -27,14 +27,13 @@ def get_timeseries_datasets():
         max_prediction_length=training.config.MAX_PREDICTION_LENGTH,
         static_categoricals=training.config.STATIC_CATEGORICALS,
         time_varying_known_categoricals=training.config.TIME_VARYING_KNOWN_CATEGORICALS,
-        time_varying_unknown_categoricals=training.config.TIME_VARYING_UNKNOWN_CATEGORICALS,
+        # time_varying_unknown_categoricals=training.config.TIME_VARYING_UNKNOWN_CATEGORICALS,
         time_varying_known_reals=training.config.TIME_VARYING_KNOWN_REALS,
         time_varying_unknown_reals=training.config.TIME_VARYING_UNKNOWN_REALS,
         target_normalizer=GroupNormalizer(groups = training.config.GROUP_IDS, transformation='softplus'),
         add_relative_time_idx=True,
         add_encoder_length=True,
         add_target_scales=True,
-        scalers={'robust': RobustScaler()},
     )
     validation_dataset = TimeSeriesDataSet.from_dataset(training_dataset, train, min_prediction_idx = 4000, predict_mode=False, stop_randomization=True)
     return training_dataset, validation_dataset

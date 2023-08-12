@@ -56,7 +56,7 @@ class OutputFormatter:
         self._process_results()
         self.aligned_dataframes = {}
         for quantile in self.quantiles:
-            columns = ['idx', 'ticker'] + [col for col in self.unaligned_results.columns if str(quantile) in col]
+            columns = ['idx', 'ticker'] + [col for col in self.unaligned_results.columns if f'P{quantile*100:.0f}' in col]
             quantile_df = self.unaligned_results[columns]
             quantile_df = quantile_df.groupby('ticker').apply(self._shift_results)
             self.aligned_dataframes[quantile] = quantile_df

@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 from pytorch_forecasting import TimeSeriesDataSet, TemporalFusionTransformer, GroupNormalizer, QuantileLoss, Baseline, RMSE
-from pytorch_forecasting.metrics import SMAPE, MAPE, MASE, RMSE
 import pandas as pd
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
@@ -11,10 +10,13 @@ import training.callbacks as callbacks
 from torch.utils.data import DataLoader
 import warnings
 import training.evaluator as evaluator
+import importlib
+importlib.reload(evaluator)
 torch.manual_seed(42)
 warnings.filterwarnings("ignore")  
 import loader
 import core
+import utils
 
 
 def get_trainer():
@@ -62,7 +64,6 @@ if __name__ == "__main__":
     best_model_path = trainer.checkpoint_callback.best_model_path
     best_tft = TemporalFusionTransformer.load_from_checkpoint(best_model_path)
     test_results = evaluator.evaluate(trainer, best_tft, test_dataloader)
-    preds, aligned = evaluator.predict_and_plot(best_tft, test_dataframe, test_dataset, 1)
-
+    preds, aligned = evaluator.predict_and_plot(best_tft, test_dataframe, test_dataset, 3)
 
 

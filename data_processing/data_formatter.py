@@ -24,7 +24,8 @@ class DataProcessor:
         self.data.columns = self.data.columns.str.lower()
 
     def get_date_columns(self):
-        self.data['date'] = pd.to_datetime(self.data['date'])
+        self.data['date'] = pd.to_datetime(self.data['date'], utc=True)
+        self.data['date'] = self.data['date'].dt.tz_localize(None)
         self.data['month'] = self.data['date'].dt.month
         self.data['day_of_the_week'] = self.data['date'].dt.dayofweek
         self.data['day_of_the_month'] = self.data['date'].dt.day
@@ -47,7 +48,7 @@ class DataProcessor:
 
     def get_historical_volatility(self):
         if 'log_returns' in self.data.columns:
-            self.data[f'historical_volatility_5_day'] = self.data.groupby(self.identifier)['log_returns'].rolling(self.volatility_window).std().reset_index(0, drop=True)
+            self.data[f'historical_volatility_5_day'] = self.data.groupby(self.identifier)['log_returns'].rolling(self.volatility_window).mean().reset_index(0, drop=True)
         else:
             raise ValueError('Must create log returns before calculating volatility!')
 
@@ -83,9 +84,14 @@ class DataProcessor:
         self.data['earnings_date'] = self.data['earnings_date'].apply(lambda x: 0 if pd.isnull(x) else 1)
         self.data['post_earnings_date'] = self.data.groupby('ticker')['earnings_date'].shift(1).fillna(0)
     
+    def add_earnings_periods(self):
+        self.data['earnings_period'] = self.data.apply(lambda row: 1 if row['day_of_the_month'] in np.arange(10, 22, 1) \
+                                                       and row['month'] in [1, 4, 7, 10] and row['day_of_the_week'] != 4 else 0, axis=1)
+
     def add_cpi_report(self):
         cpi_data = pd.read_csv(core.CPI_DATA)
         cpi_data['cpi_date'] = pd.to_datetime(cpi_data['cpi_date'])
+        self.data['date'] = pd.to_datetime(self.data['date']).dt.date.astype('datetime64[ns]')
         self.data = pd.merge(self.data, cpi_data[['cpi_date']], left_on='date', right_on='cpi_date', how = 'left')
         self.data['cpi_date'] = self.data['cpi_date'].apply(lambda x: 0 if pd.isnull(x) else 1)
         self.data.rename(columns={'cpi_date': 'cpi_report'}, inplace=True)
@@ -99,6 +105,7 @@ class DataProcessor:
     def monthly_options_expiration(self):
         self.data['monthly_options_expiration'] = self.data.apply(lambda row: 1 if row['day_of_the_week'] == 4 and row['weekday_count'] == 3 else 0, axis=1)
 
+
 def data_management_pipeline(data, starting_idx_value: int = 0):
     dm = DataProcessor(data)
     dm.format_column_names()
@@ -109,8 +116,9 @@ def data_management_pipeline(data, starting_idx_value: int = 0):
     dm.get_target_volatility()
     dm.get_previous_day_range()
     dm.drop_unused_columns(COLUMNS_TO_DROP)
+    dm.add_earnings_periods()
     # dm.fill_blank_numerical_cols()
-    dm.add_earnings_dates()
+    # dm.add_earnings_dates()
     dm.add_cpi_report()
     dm.positive_or_negative_returns()
     dm.quadruple_witching()
@@ -120,19 +128,6 @@ def data_management_pipeline(data, starting_idx_value: int = 0):
 
     return dm.data
 
-def split_train_valid_test(data:pd.DataFrame):
-    max_idx = data['idx'].max()
-    train_end_idx = max_idx - training.config.VALIDATION_DATA_LENGTH - training.config.TEST_DATA_LENGTH
-    valid_end_idx = max_idx - training.config.TEST_DATA_LENGTH
-    train = data[data['idx'] <= train_end_idx]
-    valid = data[(data['idx'] > train_end_idx) & (data['idx'] <= valid_end_idx)]
-    test = data[data['idx'] > valid_end_idx]
-    return train, valid, test
-
-def save_train_valid_test(train_data: pd.DataFrame, valid_data: pd.DataFrame, test_data: pd.DataFrame):
-    train_data.to_csv(core.TRAIN_DATA_PATH, index = False)
-    valid_data.to_csv(core.VALID_DATA_PATH, index = False)
-    test_data.to_csv(core.TEST_DATA_PATH, index = False)
 
 def persist_column_type(data):
     data[training.config.TIME_VARYING_KNOWN_CATEGORICALS+training.config.TIME_VARYING_UNKNOWN_CATEGORICALS]\
