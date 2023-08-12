@@ -1,7 +1,8 @@
 !data/nasdaq_schedule.csv
 !data/earnings.csv
 !data/cpi.csv
-data/*
+/training/baseline.py
+/training/overfit.py
 /lightning_logs
 /garch
 /optuna_test

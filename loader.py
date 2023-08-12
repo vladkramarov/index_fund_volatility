@@ -9,10 +9,6 @@ from pytorch_forecasting import TemporalFusionTransformer
 import joblib
 importlib.reload(core)
 
-
-start_date = dt.datetime(2019, 1, 1)
-
-
 def get_data_from_api(tickers: List[str] = core.TICKERS, start_date: Union[dt.datetime, str] = None, end_date: Union[dt.datetime, None] = None) -> pd.DataFrame:
     df_list = []
     for ticker in tickers:

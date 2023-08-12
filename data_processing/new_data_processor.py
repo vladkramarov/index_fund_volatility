@@ -81,7 +81,6 @@ class NewDataManager:
     
     def _process_data(self):
         self.processed_data = data_formatter.data_management_pipeline(self.new_data, self.starting_idx)
-        self.processed_data.rename(columns={'cpi_date': 'cpi_report'}, inplace=True)
         self.processed_data = data_formatter.persist_column_type(self.processed_data)
         
     def process_new_data_pipeline(self):

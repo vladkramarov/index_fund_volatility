@@ -4,14 +4,14 @@ MAX_ENCODER_LENGTH = 63
 MAX_PREDICTION_LENGTH = 10
 BATCH_SIZE = 64
 VAL_BATCH_SIZE = 256
-LEARNING_RATE =  0.0000069843 #3.45717E-06
-HIDDEN_SIZE = 48 #36 #48
+LEARNING_RATE =  0.0000069843 
+HIDDEN_SIZE = 64 #48 #36 #48
 QUANTILES = [0.1, 0.5, 0.9]
-HIDDEN_CONTINUOUS_SIZE = 44 #29 #44 
-ATTENTION_HEADS = 5 #5 #4
+HIDDEN_CONTINUOUS_SIZE = 56 #29 #44 
+ATTENTION_HEADS = 4 #5 #4
 
-GRADIENT_CLIP_VAL = 0.055219 #0.1975899 #0.055219 #0.0144732981072584084 #0.03638392866477776 #
-DROPOUT =  0.27335 #0.199286 #0.27335
+GRADIENT_CLIP_VAL = 0.055219
+DROPOUT =  0.27335 
 
 VALIDATION_DATA_LENGTH = 252
 TEST_DATA_LENGTH = 252
@@ -21,19 +21,14 @@ VOLATILITY_WINDOW = 5
 
 # COLUMNS FOR TIMESERIESDATASET
 GROUP_IDS=["ticker"]
-TARGET = 'volatility_target'
+TARGET = 'volatility'
 STATIC_CATEGORICALS=["ticker"]
-TIME_VARYING_KNOWN_CATEGORICALS= ["day_of_the_week", "month", 'earnings_date', 'cpi_report']
+TIME_VARYING_KNOWN_CATEGORICALS= ["day_of_the_week", 'month', 'day_of_the_month', 'earnings_date', 'post_earnings_date', 'cpi_report',\
+                                  'monthly_options_expiration', 'quadruple_witching'] 
 TIME_VARYING_UNKNOWN_CATEGORICALS = ['positive_or_negative']
-TIME_VARYING_KNOWN_REALS = ['idx']
-TIME_VARYING_UNKNOWN_REALS=['log_returns_absolute', "prev_day_range", "volume", 'historical_volatility']
+TIME_VARYING_KNOWN_REALS = ['idx', 'year']
+TIME_VARYING_UNKNOWN_REALS=['log_returns_absolute', "log_prev_day_range", "log_volume_change", 'historical_volatility_5_day']
 
 
 LAST_TEST_DATASET_DATE = '2023-07-20'
 LAST_TEST_IDX = 4756
-
-
-# os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
-# mps_fallback_enabled = os.environ.get('PYTORCH_ENABLE_MPS_FALLBACK', '0') == '1'
-# print(f"Is MPS fallback enabled? {mps_fallback_enabled}")
-

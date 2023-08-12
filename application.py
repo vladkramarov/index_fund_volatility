@@ -38,20 +38,3 @@ async def predict(input_data: Dict):
     results['errors'] = errors
     return results
 
-# @application.post("/predict_new")
-# async def predict_new(input_data: Dict):
-#     processed_data = pd.DataFrame(input_data['processed_data'])
-#     model = loader.get_model()
-#     ts_dataset_params = loader.get_timeseries_params()
-#     ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict=False)
-#     results = {}
-#     preds = model.predict(ts_dataset, return_index=True, return_x=True, mode='quantiles')
-#     index = preds.index
-#     output = preds[0].to('cpu').detach().numpy()
-#     logger.info(f'Index shape: {index.shape}')
-#     logger.info(f'Index type: {type(index)}')
-#     formatter = output_formatter.OutputFormatter(earliest_prediction_date='2023-07-25', prediction=preds)
-#     final = formatter.get_unaligned_results(processed_data)
-#     final.replace(np.nan, "N/A", inplace=True)
-#     results['results'] = final.to_dict(orient='records')
-#     return results
