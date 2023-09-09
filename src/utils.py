@@ -1,7 +1,7 @@
 import pandas as pd
 import importlib
 import core
-import training.config
+import src.training as training
 import matplotlib.pyplot as plt
 from typing import Tuple, List, Dict
 from pytorch_forecasting import TemporalFusionTransformer

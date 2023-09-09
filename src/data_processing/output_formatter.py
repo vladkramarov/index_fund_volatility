@@ -1,42 +1,38 @@
 from __future__ import annotations
 import pandas as pd
-import core
-import importlib
-from typing import List
-import training.config
 from pytorch_forecasting.models import base_model
-import loader
-
-importlib.reload(core)
+import core
+from typing import List
+import src.training.config as config
+import src.loader as loader
 
 
 def generate_feature_names() -> List[str]:
     return [
         f"horizon_{horizon}_days"
-        for horizon in range(1, training.config.MAX_PREDICTION_LENGTH + 1)
+        for horizon in range(1, config.MAX_PREDICTION_LENGTH + 1)
     ]
 
-
 class OutputFormatter:
-    def __init__(
-        self,
-        earliest_prediction_date: str,
-        prediction,
-        quantiles: List[float] = training.config.QUANTILES,
-        prediction_data_type: str = "list",
-    ):
+    def __init__(self, earliest_prediction_date: str, prediction, quantiles: List[float] = config.QUANTILES, prediction_data_type: str = "list"):
         self.prediction = prediction
         self.quantiles = quantiles
         self.quantile_results = {}
         self.generic_feature_names = generate_feature_names()
         self.earliest_prediction_date = earliest_prediction_date
 
-        if prediction_data_type == "torch":
-            self.unaligned_results = self.prediction.index.copy()
-            self.output = self.prediction[0].to("cpu").detach().numpy()
+        if isinstance(prediction, list):
+            self.output = prediction[0].numpy()
+            self.unaligned_results = prediction[-1]
         else:
-            self.unaligned_results = self.prediction[-1]
-            self.output = self.prediction[0].numpy()
+            self.output = self.prediction[0].to("cpu").detach().numpy()
+            self.unaligned_results = self.prediction.index.copy()
+        # if prediction_data_type == "torch":
+        #     self.unaligned_results = self.prediction.index.copy()
+        #     self.output = self.prediction[0].to("cpu").detach().numpy()
+        # else:
+        #     self.unaligned_results = self.prediction[-1]
+        #     self.output = self.prediction[0].numpy()
 
     def _process_results(self) -> pd.DataFrame:
         if self.quantiles:
@@ -74,7 +70,7 @@ class OutputFormatter:
         return self.unaligned_results
 
     def _shift_results(self, data) -> pd.DataFrame:
-        for i in range(training.config.MAX_PREDICTION_LENGTH):
+        for i in range(config.MAX_PREDICTION_LENGTH):
             data.iloc[:, i + 2] = data.iloc[:, i + 2].shift(i + 1)
         return data
 

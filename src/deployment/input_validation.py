@@ -1,9 +1,8 @@
 import pandas as pd
-from typing import Union
+import datetime as dt
 import datetime as dt
 from pydantic import BaseModel, validator, ValidationError
-import datetime as dt
-from typing import List, Dict, Tuple
+from typing import List, Dict
 import core
 
 

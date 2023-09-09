@@ -1,15 +1,12 @@
-import yfinance as yf
 import datetime as dt
-from typing import List, Dict, Union
+from typing import List
 import numpy as np
-import importlib
-from typing import Callable
+import yfinance as yf
 import core
-import loader
-import training.config
+import src.loader as loader
+import src.training.config as config
 import pandas as pd
-import matplotlib.pyplot as plt
-import utils
+import src.utils as utils
 
 COLUMNS_TO_DROP = ["open", "dividends", "stock splits"]
 
@@ -19,7 +16,7 @@ class DataProcessor:
         self,
         data: pd.DataFrame,
         identifier_column: str = "ticker",
-        volatility_window: int = training.config.VOLATILITY_WINDOW,
+        volatility_window: int = config.VOLATILITY_WINDOW,
     ):
         self.data = data.reset_index().rename(columns={"index": "idx"})
         self.identifier = identifier_column
@@ -79,15 +76,15 @@ class DataProcessor:
         if "log_returns" in self.data.columns:
             self.data["volatility_target"] = (
                 self.data.groupby(self.identifier)["log_returns"]
-                .shift(-training.config.VOLATILITY_WINDOW)
-                .rolling(training.config.VOLATILITY_WINDOW)
+                .shift(-config.VOLATILITY_WINDOW)
+                .rolling(config.VOLATILITY_WINDOW)
                 .std()
                 .reset_index(0, drop=True)
             )
             self.data["volatility"] = np.sqrt(
                 self.data.groupby(self.identifier)["log_returns_squared"]
-                .shift(-training.config.VOLATILITY_WINDOW)
-                .rolling(training.config.VOLATILITY_WINDOW)
+                .shift(-config.VOLATILITY_WINDOW)
+                .rolling(config.VOLATILITY_WINDOW)
                 .mean()
                 .reset_index(0, drop=True)
             )
@@ -181,13 +178,13 @@ class DataProcessor:
         )
 
     def enrich_rare_features(
-        self, rare_features: List[str] = training.config.FEATURES_TO_ENRICH
+        self, rare_features: List[str] = config.FEATURES_TO_ENRICH
     ):
         for feature in rare_features:
             self.data[f"{feature}_new"] = (
                 self.data.groupby(self.identifier)[feature]
-                .shift(-training.config.VOLATILITY_WINDOW + 1)
-                .rolling(training.config.VOLATILITY_WINDOW)
+                .shift(-config.VOLATILITY_WINDOW + 1)
+                .rolling(config.VOLATILITY_WINDOW)
                 .max()
                 .reset_index(0, drop=True)
             )
@@ -219,11 +216,11 @@ def data_management_pipeline(data, starting_idx_value: int = 0):
 
 def persist_column_type(data):
     data[
-        training.config.TIME_VARYING_KNOWN_CATEGORICALS
-        + training.config.TIME_VARYING_UNKNOWN_CATEGORICALS
+        config.TIME_VARYING_KNOWN_CATEGORICALS
+        + config.TIME_VARYING_UNKNOWN_CATEGORICALS
     ] = data[
-        training.config.TIME_VARYING_KNOWN_CATEGORICALS
-        + training.config.TIME_VARYING_UNKNOWN_CATEGORICALS
+        config.TIME_VARYING_KNOWN_CATEGORICALS
+        + config.TIME_VARYING_UNKNOWN_CATEGORICALS
     ].astype(
         str
     )

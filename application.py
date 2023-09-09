@@ -1,14 +1,15 @@
-from fastapi import FastAPI, HTTPException
-import uvicorn
-import deployment.predict
-import data_processing.input_validation as input_validation
-from typing import Dict, List
-import data_processing.new_data_processor as new_data_processor
-import loader
 import numpy as np
 import pandas as pd
 import logging
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from typing import Dict, List
 from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
+import src.deployment.prediction_pipeline as prediction_pipeline
+import src.deployment.input_validation as input_validation
+import src.data_processing.new_data_processor as new_data_processor
+import src.loader as loader
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,8 +33,8 @@ async def predict(input_data: Dict):
             tickers=input_data["tickers"],
             prediction_start_date=input_data["prediction_start_date"],
         )
-        preds = deployment.predict.predict(processed_data)
-        processed_output = deployment.predict.process_output(
+        preds = prediction_pipeline.predict(processed_data)
+        processed_output = prediction_pipeline.process_output(
             preds,
             input_data["prediction_start_date"],
             processed_data,

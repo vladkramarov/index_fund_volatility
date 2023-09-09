@@ -1,17 +1,12 @@
 import datetime as dt
-from typing import List, Dict, Union
 import numpy as np
-import importlib
-import core
-import loader
-import training.config
 import pandas as pd
-import data_processing.data_formatter as data_formatter
-import importlib
 import datetime as dt
+from typing import List, Union
 from pytorch_forecasting import TimeSeriesDataSet
-
-importlib.reload(data_formatter)
+import src.data_processing.data_formatter as data_formatter
+import src.training.config as config
+import src.loader as loader
 
 
 def get_last_market_date(
@@ -43,7 +38,7 @@ class NewDataManager:
             "%Y-%m-%d"
         )
         business_days_to_subtract = (
-            training.config.MAX_ENCODER_LENGTH + training.config.VOLATILITY_WINDOW + 5
+            config.MAX_ENCODER_LENGTH + config.VOLATILITY_WINDOW + 5
         )
         self.encoder_start_date = pd.to_datetime(
             np.busday_offset(
@@ -56,9 +51,9 @@ class NewDataManager:
             "%Y-%m-%d"
         )
         business_days = np.busday_count(
-            training.config.LAST_TEST_DATASET_DATE, encoder_start_date_str
+            config.LAST_TEST_DATASET_DATE, encoder_start_date_str
         )
-        self.starting_idx = business_days + training.config.LAST_TEST_IDX
+        self.starting_idx = business_days + config.LAST_TEST_IDX
 
     def _get_first_prediction_idx(self):
         if self.processed_data is None:
@@ -91,7 +86,7 @@ class NewDataManager:
         self.future_prediction_dates = self._market_schedule.loc[
             last_market_index
             + 1 : last_market_index
-            + training.config.MAX_PREDICTION_LENGTH
+            + config.MAX_PREDICTION_LENGTH
             - 1
         ]["market_date"].values
 

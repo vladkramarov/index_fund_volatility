@@ -7,12 +7,7 @@ HOSTS = {
     "local": "http://localhost:8000/predict",
 }
 
-
-def test_api(
-    host_name: str = "aws",
-    tickers: list = ["XLK", "XLP"],
-    prediction_start_date: str = "2023-08-09",
-):
+def test_api(host_name: str = "aws", tickers: list = ["XLK", "XLP"],  prediction_start_date: str = "2023-08-09"):
     host = HOSTS[host_name]
     input_data = {"tickers": tickers, "prediction_start_date": prediction_start_date}
 

@@ -1,29 +1,20 @@
-from pytorch_forecasting.models.temporal_fusion_transformer.tuning import (
-    optimize_hyperparameters,
-)
-from pytorch_forecasting.models.temporal_fusion_transformer.tuning import (
-    pl as tuning_pl,
-)
-import data_processing.dataset_and_loaders as dataset_and_loaders
-import pickle
-import training.config
-import training.callbacks as tr_callbacks
-import pytorch_lightning as pl
-from lightning.pytorch.tuner import Tuner
-import training.training as tr_training
-from pytorch_forecasting import TimeSeriesDataSet
-from torch.utils.data import DataLoader
-import matplotlib.pyplot as plt
-from pytorch_forecasting.metrics import RMSE, QuantileLoss
-import training.config
 import datetime
+import pickle
+import pytorch_lightning as pl
+from pytorch_forecasting import TimeSeriesDataSet
+from lightning.pytorch.tuner import Tuner
+from pytorch_forecasting.models.temporal_fusion_transformer.tuning import optimize_hyperparameters
+from pytorch_forecasting.models.temporal_fusion_transformer.tuning import pl as tuning_pl
+from pytorch_forecasting.metrics import RMSE, QuantileLoss
+from torch.utils.data import DataLoader
+import src.training.config as config
+import src.training.callbacks as callbacks
+import src.training.training as tr_training
+import src.training.config as config
+import src.data_processing.dataset_and_loaders as dataset_and_loaders
 
-(
-    train_dataset,
-    val_dataset,
-    train_dataloader,
-    val_dataloader,
-) = dataset_and_loaders.get_timeseries_datasets_and_dataloaders()
+train_dataset, val_dataset, train_dataloader, val_dataloader \
+    = dataset_and_loaders.get_timeseries_datasets_and_dataloaders()
 
 
 def learn_rate_tuner(
@@ -62,10 +53,10 @@ def hparam_optimization():
         hidden_size_range=(18, 72),
         hidden_continuous_size_range=(18, 72),
         attention_head_size_range=(2, 6),
-        learning_rate=training.config.LEARNING_RATE,
+        learning_rate=config.LEARNING_RATE,
         dropout_range=(0.1, 0.5),
         trainer_kwargs=dict(limit_train_batches=50),
-        log_dir="/Users/vladyslavkramarov/Documents/stock_volatility/lightning_logs/optuna_quantile_loss_63_input_10_output",
+        log_dir=f"/Users/vladyslavkramarov/Documents/stock_volatility/lightning_logs/{time_now}",
         use_learning_rate_finder=False,
         loss=QuantileLoss([0.1, 0.5, 0.9]),
     )

@@ -1,13 +1,9 @@
-from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
-import core
-import importlib
-import loader
 import pandas as pd
-import joblib
-import data_processing.new_data_processor as new_data_processor
-import data_processing.output_formatter as output_formatter
+from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
+import src.loader as loader
+import src.data_processing.new_data_processor as new_data_processor
+import src.data_processing.output_formatter as output_formatter
 
-importlib.reload(core)
 
 
 def predict(processed_data: pd.DataFrame):

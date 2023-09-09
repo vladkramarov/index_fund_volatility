@@ -1,22 +1,22 @@
-from pytorch_forecasting import TimeSeriesDataSet, TemporalFusionTransformer
 import pandas as pd
 import lightning.pytorch as pl
 import matplotlib.pyplot as plt
-import training.config
-import data_processing.dataset_and_loaders as dataset_and_loaders
-from torch.utils.data import DataLoader
-import core
 from typing import List, Tuple, Dict
 import seaborn as sns
+from pytorch_forecasting import TimeSeriesDataSet, TemporalFusionTransformer
+from torch.utils.data import DataLoader
+import matplotlib.dates as mdates
 from sklearn.metrics import (
     mean_squared_error,
     mean_absolute_error,
     mean_absolute_percentage_error,
     SCORERS,
 )
-import matplotlib.dates as mdates
+import src.training.config as config
+import src.data_processing.dataset_and_loaders as dataset_and_loaders
+import core
 import data_processing.output_formatter as output_formatter
-import loader
+import src.loader as loader
 
 SCORERS["mae"] = mean_absolute_error
 SCORERS["mape"] = mean_absolute_percentage_error
@@ -36,7 +36,7 @@ def evaluate(
 def get_metrics(
     data: pd.DataFrame,
     prediction_feature: str,
-    target: str = training.config.TARGET,
+    target: str = config.TARGET,
     metric_list: List[str] = ["rmse", "mae", "mape"],
 ) -> Tuple[List[float], str]:
     rmse = mean_squared_error(data[target], data[prediction_feature], squared=False)
@@ -73,7 +73,7 @@ def plot_results_over_time(
             label="0.1-0.9 quantile",
         )
         sns.lineplot(
-           aligned_results=ticker_data, x="date", y=training.config.TARGET, ax=ax_current
+           aligned_results=ticker_data, x="date", y=config.TARGET, ax=ax_current
         )
         ax_current.set_title(f"{ticker} {days_ahead} days ahead")
         ax_current.xaxis.set_major_locator(mdates.DayLocator(interval=90))
@@ -101,9 +101,9 @@ def plot_metrics_over_horizons(
 ):
     metric = SCORERS[metric_name]
     horizon_scores = {}
-    for horizon in range(1, training.config.MAX_PREDICTION_LENGTH + 1):
+    for horizon in range(1, config.MAX_PREDICTION_LENGTH + 1):
         prediction_feature = f"horizon_{horizon}_days_P50"
-        score = metric(aligned_results[training.config.TARGET], aligned_results[prediction_feature])
+        score = metric(aligned_results[config.TARGET], aligned_results[prediction_feature])
         horizon_scores[prediction_feature] = score
 
     fig, ax = plt.subplots(figsize=(15, 6))
@@ -116,6 +116,7 @@ def plot_metrics_over_horizons(
     plt.show()
 
     return fig, ax
+
 
 def predict_and_plot(
     model: TemporalFusionTransformer,
@@ -132,7 +133,7 @@ def predict_and_plot(
     aligned = output_form.get_aligned_results(original_dataframe)
     aligned = pd.merge(
         aligned,
-        original_dataframe[["ticker", "date", training.config.TARGET]],
+        original_dataframe[["ticker", "date", config.TARGET]],
         on=["ticker", "date"],
     )
     aligned.dropna(inplace=True)
