@@ -12,5 +12,6 @@ def test_api(host_name: str = 'aws', tickers: list = ['XLK'], prediction_start_d
     return requests.post(host, json=input_data)
 
 if __name__ == "__main__":
-    response = test_api(host_name='local')
+    response = test_api(host_name='aws')
 
+response.content

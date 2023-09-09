@@ -20,7 +20,7 @@ def process_output(preds, prediction_start_date: str, processed_data: pd.DataFra
     output_form = output_formatter.OutputFormatter(earliest_prediction_date=prediction_start_date, prediction=preds)
     return output_form.get_unaligned_results(processed_data)
     
-def prediction_pipeline(tickers = ['AAPL', 'MSFT'], prediction_start_date = '2023-07-25') -> pd.DataFrame:
+def prediction_pipeline(tickers = ['XLK'], prediction_start_date = '2023-07-25') -> pd.DataFrame:
     processed_data, _ = new_data_processor.new_data_pipeline(tickers = tickers, prediction_start_date = prediction_start_date)
     processed_data['volatility_target'] = 0.01
     preds = predict(processed_data)

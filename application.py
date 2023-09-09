@@ -33,8 +33,8 @@ async def predict(input_data: Dict):
         preds = deployment.predict.predict(processed_data)
         processed_output = deployment.predict.process_output(preds, input_data['prediction_start_date'], processed_data)
         processed_output.replace(np.nan, "N/A", inplace=True)
-        results['results'] = processed_output.to_dict(orient='records')
+        results['results'] = type(preds)
     
-    results['errors'] = errors
+    # results['errors'] = errors
     return results
 
