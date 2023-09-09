@@ -18,7 +18,7 @@ torch.manual_seed(42)
 warnings.filterwarnings("ignore")
 
 
-def get_trainer():
+def get_trainer() -> pl.Trainer:
     early_stop_callback, lr_logger, logger, checkpoint, model_summary = callbacks.get_callbacks()
     trainer = pl.Trainer(
         max_epochs=250,
@@ -33,7 +33,7 @@ def get_trainer():
     return trainer
 
 
-def get_tft_model(training_dataset: TimeSeriesDataSet):
+def get_tft_model(training_dataset: TimeSeriesDataSet) -> TemporalFusionTransformer:
     tft = TemporalFusionTransformer.from_dataset(
         training_dataset,
         learning_rate=config.LEARNING_RATE,

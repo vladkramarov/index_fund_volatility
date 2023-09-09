@@ -1,6 +1,7 @@
 import datetime
 import pickle
 import pytorch_lightning as pl
+from typing import Dict, Union
 from pytorch_forecasting import TimeSeriesDataSet
 from lightning.pytorch.tuner import Tuner
 from pytorch_forecasting.models.temporal_fusion_transformer.tuning import optimize_hyperparameters
@@ -39,7 +40,7 @@ def learn_rate_tuner(
     return tuner
 
 
-def hparam_optimization():
+def hparam_optimization() -> Dict[str, Union[str, float, int]]:
     time_now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     study = optimize_hyperparameters(
         train_dataloader,

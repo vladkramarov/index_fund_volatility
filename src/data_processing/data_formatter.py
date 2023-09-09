@@ -33,8 +33,7 @@ class DataProcessor:
         self.data["day_of_the_month"] = self.data["date"].dt.day
         self.data["year"] = self.data["date"].dt.year
         self.data["weekday_count"] = self.data.groupby(
-            ["ticker", "month", "year", "day_of_the_week"]
-        )["day_of_the_week"].cumcount()
+            ["ticker", "month", "year", "day_of_the_week"])["day_of_the_week"].cumcount()
 
     def fix_idx_column(self, starting_index: int = 0):
         self.data = self.data.sort_values(["ticker", "date"])
@@ -146,13 +145,8 @@ class DataProcessor:
 
     def quadruple_witching(self):
         self.data["quadruple_witching"] = self.data.apply(
-            lambda row: 1
-            if row["day_of_the_week"] == 4
-            and row["month"] in ([3, 6, 9, 12])
-            and row["weekday_count"] == 3
-            else 0,
-            axis=1,
-        )
+            lambda row: 1 if row["day_of_the_week"] == 4 and row["month"] in ([3, 6, 9, 12]) and row["weekday_count"] == 3 else 0,
+            axis=1)
 
     def monthly_options_expiration(self):
         self.data["monthly_options_expiration"] = self.data.apply(
@@ -215,13 +209,6 @@ def data_management_pipeline(data, starting_idx_value: int = 0):
 
 
 def persist_column_type(data):
-    data[
-        config.TIME_VARYING_KNOWN_CATEGORICALS
-        + config.TIME_VARYING_UNKNOWN_CATEGORICALS
-    ] = data[
-        config.TIME_VARYING_KNOWN_CATEGORICALS
-        + config.TIME_VARYING_UNKNOWN_CATEGORICALS
-    ].astype(
-        str
-    )
+    data[config.TIME_VARYING_KNOWN_CATEGORICALS + config.TIME_VARYING_UNKNOWN_CATEGORICALS] =\
+        data[config.TIME_VARYING_KNOWN_CATEGORICALS + config.TIME_VARYING_UNKNOWN_CATEGORICALS].astype(str)
     return data

@@ -14,7 +14,7 @@ def generate_feature_names() -> List[str]:
     ]
 
 class OutputFormatter:
-    def __init__(self, earliest_prediction_date: str, prediction, quantiles: List[float] = config.QUANTILES, prediction_data_type: str = "list"):
+    def __init__(self, earliest_prediction_date: str, prediction, quantiles: List[float] = config.QUANTILES):
         self.prediction = prediction
         self.quantiles = quantiles
         self.quantile_results = {}
@@ -27,46 +27,24 @@ class OutputFormatter:
         else:
             self.output = self.prediction[0].to("cpu").detach().numpy()
             self.unaligned_results = self.prediction.index.copy()
-        # if prediction_data_type == "torch":
-        #     self.unaligned_results = self.prediction.index.copy()
-        #     self.output = self.prediction[0].to("cpu").detach().numpy()
-        # else:
-        #     self.unaligned_results = self.prediction[-1]
-        #     self.output = self.prediction[0].numpy()
 
     def _process_results(self) -> pd.DataFrame:
         if self.quantiles:
             for position, quantile in enumerate(self.quantiles):
                 quantile_predictions = self.output[:, :, position]
-                quantile_feature_names = [
-                    f"{feature_name}_P{quantile*100:.0f}"
-                    for feature_name in self.generic_feature_names
-                ]
-                quantile_preds_df = pd.DataFrame(
-                    quantile_predictions, columns=quantile_feature_names
-                )
-                self.unaligned_results[
-                    quantile_feature_names
-                ] = quantile_preds_df.values
+                quantile_feature_names = [f"{feature_name}_P{quantile*100:.0f}" for feature_name in self.generic_feature_names]
+                quantile_preds_df = pd.DataFrame(quantile_predictions, columns=quantile_feature_names)
+                self.unaligned_results[quantile_feature_names] = quantile_preds_df.values
                 self.quantile_results[quantile] = quantile_preds_df
         else:
             self.unaligned_results[core.FORECAST_HORIZONS] = self.output
-            self.unaligned_results = self.unaligned_results.sort_values(
-                ["ticker", "idx"]
-            )
+            self.unaligned_results = self.unaligned_results.sort_values(["ticker", "idx"])
         return self.unaligned_results
 
     def get_unaligned_results(self, original_data: pd.DataFrame) -> pd.DataFrame:
         self._process_results()
-        self.unaligned_results = pd.merge(
-            self.unaligned_results,
-            original_data[["ticker", "idx", "date"]],
-            on=["ticker", "idx"],
-            how="left",
-        )
-        self.unaligned_results = self.unaligned_results.loc[
-            self.unaligned_results["date"] >= self.earliest_prediction_date
-        ]
+        self.unaligned_results = pd.merge(self.unaligned_results,original_data[["ticker", "idx", "date"]], on=["ticker", "idx"],how="left")
+        self.unaligned_results = self.unaligned_results.loc[self.unaligned_results["date"] >= self.earliest_prediction_date]
         return self.unaligned_results
 
     def _shift_results(self, data) -> pd.DataFrame:
@@ -81,31 +59,15 @@ class OutputFormatter:
         self._process_results()
         self.aligned_dataframes = {}
         for quantile in self.quantiles:
-            columns = ["idx", "ticker"] + [
-                col
-                for col in self.unaligned_results.columns
-                if f"P{quantile*100:.0f}" in col
-            ]
+            columns = ["idx", "ticker"] + [col for col in self.unaligned_results.columns if f"P{quantile*100:.0f}" in col]
             quantile_df = self.unaligned_results[columns]
             quantile_df = quantile_df.groupby("ticker").apply(self._shift_results)
             self.aligned_dataframes[quantile] = quantile_df
 
-        self.aligned_results = pd.merge(
-            self.aligned_dataframes[self.quantiles[0]],
-            self.aligned_dataframes[self.quantiles[1]],
-            on=["ticker", "idx"],
-            how="left",
-        )
-        self.aligned_results = pd.merge(
-            self.aligned_results,
-            self.aligned_dataframes[self.quantiles[2]],
-            on=["ticker", "idx"],
-            how="left",
-        )
-        self.aligned_results = pd.merge(
-            self.aligned_results,
-            original_data[["ticker", "idx", "date"]],
-            on=["ticker", "idx"],
-            how="left",
-        )
+        self.aligned_results = pd.merge(self.aligned_dataframes[self.quantiles[0]],
+                                        self.aligned_dataframes[self.quantiles[1]], on=["ticker", "idx"],how="left")
+        self.aligned_results = pd.merge(self.aligned_results, 
+                                        self.aligned_dataframes[self.quantiles[2]], on=["ticker", "idx"],how="left")
+        self.aligned_results = pd.merge(self.aligned_results, 
+                                        original_data[["ticker", "idx", "date"]], on=["ticker", "idx"], how="left")
         return self.aligned_results

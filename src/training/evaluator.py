@@ -28,17 +28,12 @@ def get_ax(i, ax):
 
 
 def evaluate(
-    trainer: pl.Trainer, tft: TemporalFusionTransformer, dataloader: DataLoader
-) -> Dict[str, float]:
+    trainer: pl.Trainer, tft: TemporalFusionTransformer, dataloader: DataLoader) -> Dict[str, float]:
     return trainer.validate(tft, dataloader)
 
 
-def get_metrics(
-    data: pd.DataFrame,
-    prediction_feature: str,
-    target: str = config.TARGET,
-    metric_list: List[str] = ["rmse", "mae", "mape"],
-) -> Tuple[List[float], str]:
+def get_metrics(data: pd.DataFrame, prediction_feature: str, 
+                target: str = config.TARGET, metric_list: List[str] = ["rmse", "mae", "mape"]) -> Tuple[List[float], str]:
     rmse = mean_squared_error(data[target], data[prediction_feature], squared=False)
     mae = mean_absolute_error(data[target], data[prediction_feature])
     mape = mean_absolute_percentage_error(data[target], data[prediction_feature])
@@ -46,9 +41,8 @@ def get_metrics(
     return [rmse, mae, mape], text
 
 
-def plot_results_over_time(
-   aligned_results: pd.DataFrame, days_ahead: int = 1, overwrite_in_the_folder: bool = False
-):
+def plot_results_over_time(aligned_results: pd.DataFrame, days_ahead: int = 1, 
+                           overwrite_in_the_folder: bool = False):
     prediction_feature = f"horizon_{days_ahead}_days_P50"
     lower_limit = f"horizon_{days_ahead}_days_P10"
     upper_limit = f"horizon_{days_ahead}_days_P90"
@@ -57,35 +51,19 @@ def plot_results_over_time(
     for i, ticker in enumerate(aligned_results["ticker"].unique()):
         ticker_data =aligned_results.loc[aligned_results["ticker"] == ticker]
         ax_current = get_ax(i, ax)
-        sns.lineplot(
-           aligned_results=ticker_data,
-            x="date",
-            y=prediction_feature,
-            ax=ax_current,
-            legend="brief",
-            label="prediction",
-        )
-        ax_current.fill_between(
-            ticker_data["date"],
-            ticker_data[lower_limit],
-            ticker_data[upper_limit],
-            alpha=0.3,
-            label="0.1-0.9 quantile",
-        )
-        sns.lineplot(
-           aligned_results=ticker_data, x="date", y=config.TARGET, ax=ax_current
-        )
+
+        sns.lineplot(data=ticker_data, x="date", y=prediction_feature, 
+                     ax=ax_current, legend="brief", label="prediction")
+        
+        ax_current.fill_between(ticker_data["date"], ticker_data[lower_limit], 
+                                ticker_data[upper_limit], alpha=0.3, label="0.1-0.9 quantile")
+        
+        sns.lineplot(data=ticker_data, x="date", y=config.TARGET, ax=ax_current)
         ax_current.set_title(f"{ticker} {days_ahead} days ahead")
         ax_current.xaxis.set_major_locator(mdates.DayLocator(interval=90))
         metrics, text = get_metrics(ticker_data, prediction_feature)
-        ax_current.text(
-            0.05,
-            0.95,
-            text,
-            transform=ax_current.transAxes,
-            fontsize=9,
-            verticalalignment="top",
-        )
+        ax_current.text(0.05, 0.95, text, transform=ax_current.transAxes,
+                        fontsize=9, verticalalignment="top")
 
     fig.tight_layout()
 
@@ -118,18 +96,10 @@ def plot_metrics_over_horizons(
     return fig, ax
 
 
-def predict_and_plot(
-    model: TemporalFusionTransformer,
-    original_dataframe: pd.DataFrame,
-    dataset: TimeSeriesDataSet,
-    days_ahead: int = 3,
-) -> Tuple[List, pd.DataFrame]:
+def predict_and_plot(model: TemporalFusionTransformer, original_dataframe: pd.DataFrame, 
+                     dataset: TimeSeriesDataSet,days_ahead: int = 3) -> Tuple[List, pd.DataFrame]:
     preds = model.predict(dataset, return_index=True, return_x=True, mode="quantiles")
-    output_form = output_formatter.OutputFormatter(
-        earliest_prediction_date="2021-01-21",
-        prediction=preds,
-        prediction_data_type="list",
-    )
+    output_form = output_formatter.OutputFormatter(earliest_prediction_date="2021-01-21",prediction=preds)
     aligned = output_form.get_aligned_results(original_dataframe)
     aligned = pd.merge(
         aligned,

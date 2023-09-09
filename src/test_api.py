@@ -13,7 +13,6 @@ def test_api(host_name: str = "aws", tickers: list = ["XLK", "XLP"],  prediction
 
     return requests.post(host, json=input_data)
 
-
 if __name__ == "__main__":
     response = test_api(host_name="aws")
     print(response)
