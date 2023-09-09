@@ -68,3 +68,4 @@ class OutputFormatter:
             on = ['ticker', 'idx'], how = 'left')
         self.aligned_results = pd.merge(self.aligned_results, original_data[['ticker', 'idx', 'date']], on = ['ticker', 'idx'], how = 'left')
         return self.aligned_results
+

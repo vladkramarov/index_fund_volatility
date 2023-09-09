@@ -64,5 +64,3 @@ def get_model():
 
 def get_timeseries_params():
     return joblib.load(core.TIMESERIES_DATASET_PARAMS)
-
-

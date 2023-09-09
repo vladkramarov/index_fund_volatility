@@ -11,7 +11,7 @@ import importlib
 import datetime as dt
 from pytorch_forecasting import TimeSeriesDataSet
 
-importlib.reload(loader)
+importlib.reload(data_formatter)
 
 
 def get_last_market_date(date: Union[dt.datetime, str] = None, market_schedule: pd.DataFrame = None):
@@ -98,7 +98,3 @@ def get_timeseries_dataset(processed_data: pd.DataFrame):
     processed_ts_dataset = TimeSeriesDataSet.from_parameters(ts_dataset_params, processed_data, predict = False)
     return processed_ts_dataset
 
-
-
-new_data, _ = new_data_pipeline(tickers=['XLK'], prediction_start_date='2023-07-25')
-new_data.iloc[:, -10:]

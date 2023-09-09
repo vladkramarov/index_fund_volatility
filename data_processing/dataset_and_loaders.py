@@ -21,7 +21,6 @@ def get_timeseries_datasets():
         time_idx="idx",
         target=training.config.TARGET,
         group_ids=training.config.GROUP_IDS,
-        min_encoder_length=training.config.MAX_ENCODER_LENGTH - training.config.MAX_PREDICTION_LENGTH + 1,
         max_encoder_length=training.config.MAX_ENCODER_LENGTH,
         min_prediction_length=1,
         max_prediction_length=training.config.MAX_PREDICTION_LENGTH,

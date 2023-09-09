@@ -13,7 +13,6 @@ import utils
 
 COLUMNS_TO_DROP = ['open', 'dividends', 'stock splits']
 
-
 class DataProcessor:
     def __init__(self,  data: pd.DataFrame,
                  identifier_column: str = 'ticker', volatility_window: int = training.config.VOLATILITY_WINDOW):
@@ -69,8 +68,10 @@ class DataProcessor:
             self.data['log_prev_day_range'] = np.log(self.data.groupby(self.identifier)[high_price].shift(1)) - \
                 np.log(self.data.groupby(self.identifier)[low_price].shift(1))
 
-    def fill_blank_numerical_cols(self):
-        self.data['prev_day_range'] = self.data['prev_day_range'].fillna(self.get_previous_day_range())
+    def fill_blank_target_rows(self):
+        '''Fills in rows where there is no target volatility with 0
+        This method is only applicable to new data predictions. I can fill null target values with 0 since they will not be used in the encoder'''
+        self.data[['volatility_target', 'volatility']] = self.data[['volatility_target', 'volatility']].fillna(0)
 
     def drop_unused_columns(self, columns_to_drop: List[str]):
         self.data.drop(columns=columns_to_drop, inplace=True)
@@ -129,6 +130,7 @@ def data_management_pipeline(data, starting_idx_value: int = 0):
     dm.quadruple_witching()
     dm.monthly_options_expiration()
     dm.enrich_rare_features()
+    dm.fill_blank_target_rows()
     dm.drop_blank_rows()
     dm.fix_idx_column(starting_idx_value)
     return dm.data
@@ -136,11 +138,5 @@ def data_management_pipeline(data, starting_idx_value: int = 0):
 def persist_column_type(data):
     data[training.config.TIME_VARYING_KNOWN_CATEGORICALS+training.config.TIME_VARYING_UNKNOWN_CATEGORICALS]\
           = data[training.config.TIME_VARYING_KNOWN_CATEGORICALS+training.config.TIME_VARYING_UNKNOWN_CATEGORICALS].astype(str)
-    return data
-
-def enrich_rare_features(data:pd.DataFrame, feature_list: List[str]) -> pd.DataFrame:
-    for feature in feature_list:
-        data[f'{feature}_new'] = data.groupby('ticker')[feature].shift(-training.config.VOLATILITY_WINDOW+1).rolling(training.config.VOLATILITY_WINDOW).max().reset_index(0, drop = True)
-        data[f'{feature}_new'] = data[f'{feature}_new'].fillna(0)
     return data
 
