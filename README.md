@@ -28,8 +28,8 @@ Bayesian optimization was conducted to select optimal hyperparameters for the mo
 
 ## 4. Results
 
-- [1 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_1_days_ahead.png?raw=True)
-- [3 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_3_days_ahead.png?raw=True) 
-- [7 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_7_days_ahead.png?raw=True) 
-- [10 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_10_days_ahead.png?raw=True) 
+- ![1 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_1_days_ahead.png?raw=True)
+- ![3 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_3_days_ahead.png?raw=True) 
+- ![7 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_7_days_ahead.png?raw=True) 
+- ![10 day ahead predictions](/Users/vladyslavkramarov/Documents/index_funds_volatility/img/results_over_time_10_days_ahead.png?raw=True) 
 
