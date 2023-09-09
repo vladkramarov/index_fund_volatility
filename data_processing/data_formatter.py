@@ -8,10 +8,11 @@ import core
 import loader
 import training.config
 import pandas as pd
-importlib.reload(training.config)
 import matplotlib.pyplot as plt
+import utils
 
 COLUMNS_TO_DROP = ['open', 'dividends', 'stock splits']
+
 
 class DataProcessor:
     def __init__(self,  data: pd.DataFrame,
@@ -77,17 +78,9 @@ class DataProcessor:
     def drop_blank_rows(self):
         self.data.dropna(axis=0, inplace=True)
     
-    def add_earnings_dates(self):
-        earnings_data = pd.read_csv(core.EARNINGS_DATA)
-        earnings_data['earnings_date'] = pd.to_datetime(earnings_data['earnings_date'])
-        self.data = pd.merge(self.data, earnings_data[['earnings_date', 'ticker']], left_on=['date', 'ticker'], right_on=['earnings_date', 'ticker'], how = 'left')
-        self.data['earnings_date'] = self.data['earnings_date'].apply(lambda x: 0 if pd.isnull(x) else 1)
-        self.data['post_earnings_date'] = self.data.groupby('ticker')['earnings_date'].shift(1).fillna(0)
-    
     def add_earnings_periods(self):
-        self.data['earnings_period'] = self.data.apply(lambda row: 1 if row['day_of_the_month'] in np.arange(10, 22, 1) \
+        self.data['earnings_period_new'] = self.data.apply(lambda row: 1.0 if row['day_of_the_month'] in np.arange(10, 22, 1) \
                                                        and row['month'] in [1, 4, 7, 10] and row['day_of_the_week'] != 4 else 0, axis=1)
-
     def add_cpi_report(self):
         cpi_data = pd.read_csv(core.CPI_DATA)
         cpi_data['cpi_date'] = pd.to_datetime(cpi_data['cpi_date'])
@@ -105,6 +98,19 @@ class DataProcessor:
     def monthly_options_expiration(self):
         self.data['monthly_options_expiration'] = self.data.apply(lambda row: 1 if row['day_of_the_week'] == 4 and row['weekday_count'] == 3 else 0, axis=1)
 
+    def add_election_date_ranges(self):
+        election_dates = utils.generate_election_date_ranges()
+        self.data['election_dates'] = self.data.apply(lambda row: 1 if row['date'].strftime('%Y-%m-%d') in election_dates else 0, axis=1)
+
+    def employment_report(self):
+        self.data['employment_report'] == self.data.apply(lambda row: 1 if row['day_of_the_week'] == 4 and row['weekday_count'] == 1 else 0, axis=1)
+
+    def enrich_rare_features(self, rare_features: List[str] = training.config.FEATURES_TO_ENRICH):
+        for feature in rare_features:
+            self.data[f'{feature}_new'] = self.data.groupby(self.identifier)[feature].shift(-training.config.VOLATILITY_WINDOW+1).rolling(training.config.VOLATILITY_WINDOW).max().reset_index(0, drop = True)
+            self.data[f'{feature}_new'] = self.data[f'{feature}_new'].fillna(0)
+
+
 
 def data_management_pipeline(data, starting_idx_value: int = 0):
     dm = DataProcessor(data)
@@ -117,20 +123,24 @@ def data_management_pipeline(data, starting_idx_value: int = 0):
     dm.get_previous_day_range()
     dm.drop_unused_columns(COLUMNS_TO_DROP)
     dm.add_earnings_periods()
-    # dm.fill_blank_numerical_cols()
-    # dm.add_earnings_dates()
     dm.add_cpi_report()
+    dm.add_election_date_ranges()
     dm.positive_or_negative_returns()
     dm.quadruple_witching()
     dm.monthly_options_expiration()
+    dm.enrich_rare_features()
     dm.drop_blank_rows()
     dm.fix_idx_column(starting_idx_value)
-
     return dm.data
-
 
 def persist_column_type(data):
     data[training.config.TIME_VARYING_KNOWN_CATEGORICALS+training.config.TIME_VARYING_UNKNOWN_CATEGORICALS]\
           = data[training.config.TIME_VARYING_KNOWN_CATEGORICALS+training.config.TIME_VARYING_UNKNOWN_CATEGORICALS].astype(str)
+    return data
+
+def enrich_rare_features(data:pd.DataFrame, feature_list: List[str]) -> pd.DataFrame:
+    for feature in feature_list:
+        data[f'{feature}_new'] = data.groupby('ticker')[feature].shift(-training.config.VOLATILITY_WINDOW+1).rolling(training.config.VOLATILITY_WINDOW).max().reset_index(0, drop = True)
+        data[f'{feature}_new'] = data[f'{feature}_new'].fillna(0)
     return data
 

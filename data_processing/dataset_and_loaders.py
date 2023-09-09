@@ -71,4 +71,3 @@ def get_test_dataset_and_dataloaders(train_dataset: TimeSeriesDataSet):
     test_dataset = TimeSeriesDataSet.from_dataset(train_dataset, test_data, predict=False, stop_randomization=True)
     test_dataloader = test_dataset.to_dataloader(train=False, batch_size=training.config.VAL_BATCH_SIZE, num_workers = training.config.NUM_WORKERS, shuffle=False)
     return test_dataset, test_dataloader
-

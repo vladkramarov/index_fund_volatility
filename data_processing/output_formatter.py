@@ -12,12 +12,13 @@ def generate_feature_names() -> List[str]:
     return [f'horizon_{horizon}_days' for horizon in range(1, training.config.MAX_PREDICTION_LENGTH + 1)]
 
 class OutputFormatter:
-    def __init__(self, earliest_prediction_date: str, prediction, quantiles: List[float] = training.config.QUANTILES, prediction_data_type: str = 'torch'):
+    def __init__(self, earliest_prediction_date: str, prediction, quantiles: List[float] = training.config.QUANTILES, prediction_data_type: str = 'list'):
         self.prediction = prediction
         self.quantiles = quantiles
         self.quantile_results = {}
         self.generic_feature_names = generate_feature_names()
         self.earliest_prediction_date = earliest_prediction_date
+        
         if prediction_data_type == 'torch':
             self.unaligned_results = self.prediction.index.copy()
             self.output = self.prediction[0].to('cpu').detach().numpy()

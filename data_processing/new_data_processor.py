@@ -14,7 +14,6 @@ from pytorch_forecasting import TimeSeriesDataSet
 importlib.reload(loader)
 
 
-
 def get_last_market_date(date: Union[dt.datetime, str] = None, market_schedule: pd.DataFrame = None):
     '''Determines the last market date. Needed for validation purposes'''
     todays_date = pd.to_datetime(dt.datetime.today().strftime('%Y-%m-%d'))
@@ -22,10 +21,6 @@ def get_last_market_date(date: Union[dt.datetime, str] = None, market_schedule: 
     last_market_date = pd.to_datetime(past_market_dates.tail(1).values[0][0])
 
     return todays_date, last_market_date, past_market_dates
-
-def get_prediction_dates(last_market_date: Union[dt.datetime, str], market_schedule: pd.DataFrame) -> List[Union[dt.datetime, str]]:
-    '''Needed for the decoder'''
-    ...
 
 class NewDataManager:
 
@@ -105,3 +100,5 @@ def get_timeseries_dataset(processed_data: pd.DataFrame):
 
 
 
+new_data, _ = new_data_pipeline(tickers=['XLK'], prediction_start_date='2023-07-25')
+new_data.iloc[:, -10:]

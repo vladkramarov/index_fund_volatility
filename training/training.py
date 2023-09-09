@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from pytorch_forecasting import TimeSeriesDataSet, TemporalFusionTransformer, GroupNormalizer, QuantileLoss, Baseline, RMSE
+from pytorch_forecasting import TimeSeriesDataSet, TemporalFusionTransformer, QuantileLoss
 import pandas as pd
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
@@ -16,18 +16,16 @@ torch.manual_seed(42)
 warnings.filterwarnings("ignore")  
 import loader
 import core
-import utils
 
 
 def get_trainer():
-    early_stop_callback, lr_logger, logger, checkpoint = callbacks.get_callbacks()
+    early_stop_callback, lr_logger, logger, checkpoint, model_summary = callbacks.get_callbacks()
     trainer = pl.Trainer(
         max_epochs=250,
         accelerator="cpu",
         devices=1,
-        enable_model_summary=True,
         gradient_clip_val = training.config.GRADIENT_CLIP_VAL,
-        callbacks=[lr_logger, early_stop_callback, checkpoint],
+        callbacks=[lr_logger, early_stop_callback, checkpoint, model_summary],
         logger=logger, enable_checkpointing=True)
 
     return trainer
@@ -48,7 +46,6 @@ def get_tft_model(training_dataset: TimeSeriesDataSet):
         log_interval=2)
     return tft
 
-
 def run_training():
     training_dataset, val_dataset, train_dataloader, val_dataloader = dataset_and_loaders.get_timeseries_datasets_and_dataloaders()
     trainer = get_trainer()
@@ -65,5 +62,4 @@ if __name__ == "__main__":
     best_tft = TemporalFusionTransformer.load_from_checkpoint(best_model_path)
     test_results = evaluator.evaluate(trainer, best_tft, test_dataloader)
     preds, aligned = evaluator.predict_and_plot(best_tft, test_dataframe, test_dataset, 3)
-
 
