@@ -47,18 +47,18 @@ def get_metrics(
 
 
 def plot_results_over_time(
-    data: pd.DataFrame, days_ahead: int = 1, overwrite_in_the_folder: bool = False
+   aligned_results: pd.DataFrame, days_ahead: int = 1, overwrite_in_the_folder: bool = False
 ):
     prediction_feature = f"horizon_{days_ahead}_days_P50"
     lower_limit = f"horizon_{days_ahead}_days_P10"
     upper_limit = f"horizon_{days_ahead}_days_P90"
     fig, ax = plt.subplots(4, 2, figsize=(15, 8))
 
-    for i, ticker in enumerate(data["ticker"].unique()):
-        ticker_data = data.loc[data["ticker"] == ticker]
+    for i, ticker in enumerate(aligned_results["ticker"].unique()):
+        ticker_data =aligned_results.loc[aligned_results["ticker"] == ticker]
         ax_current = get_ax(i, ax)
         sns.lineplot(
-            data=ticker_data,
+           aligned_results=ticker_data,
             x="date",
             y=prediction_feature,
             ax=ax_current,
@@ -73,7 +73,7 @@ def plot_results_over_time(
             label="0.1-0.9 quantile",
         )
         sns.lineplot(
-            data=ticker_data, x="date", y=training.config.TARGET, ax=ax_current
+           aligned_results=ticker_data, x="date", y=training.config.TARGET, ax=ax_current
         )
         ax_current.set_title(f"{ticker} {days_ahead} days ahead")
         ax_current.xaxis.set_major_locator(mdates.DayLocator(interval=90))
@@ -97,13 +97,13 @@ def plot_results_over_time(
 
 
 def plot_metrics_over_horizons(
-    data: pd.DataFrame, metric_name: str = "mape", overwrite_in_the_folder: bool = False
+    aligned_results: pd.DataFrame, metric_name: str = "mape", overwrite_in_the_folder: bool = False
 ):
     metric = SCORERS[metric_name]
     horizon_scores = {}
     for horizon in range(1, training.config.MAX_PREDICTION_LENGTH + 1):
         prediction_feature = f"horizon_{horizon}_days_P50"
-        score = metric(data[training.config.TARGET], data[prediction_feature])
+        score = metric(aligned_results[training.config.TARGET], aligned_results[prediction_feature])
         horizon_scores[prediction_feature] = score
 
     fig, ax = plt.subplots(figsize=(15, 6))
@@ -116,7 +116,6 @@ def plot_metrics_over_horizons(
     plt.show()
 
     return fig, ax
-
 
 def predict_and_plot(
     model: TemporalFusionTransformer,

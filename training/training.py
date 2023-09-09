@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 import warnings
 import training.evaluator as evaluator
 import importlib
-
+import utils
 importlib.reload(evaluator)
 torch.manual_seed(42)
 warnings.filterwarnings("ignore")
@@ -76,16 +76,10 @@ def run_training():
 
 if __name__ == "__main__":
     trainer, tft = run_training()
-    (
-        training_dataset,
-        val_dataset,
-        train_dataloader,
-        val_dataloader,
-    ) = dataset_and_loaders.get_timeseries_datasets_and_dataloaders()
-    (
-        test_dataset,
-        test_dataloader,
-    ) = dataset_and_loaders.get_test_dataset_and_dataloaders(training_dataset)
+    training_dataset, val_dataset, train_dataloader, val_dataloader = \
+        dataset_and_loaders.get_timeseries_datasets_and_dataloaders()
+    test_dataset, test_dataloader = \
+        dataset_and_loaders.get_test_dataset_and_dataloaders(training_dataset)
     test_dataframe = loader.get_test_data()
     best_model_path = trainer.checkpoint_callback.best_model_path
     best_tft = TemporalFusionTransformer.load_from_checkpoint(best_model_path)
