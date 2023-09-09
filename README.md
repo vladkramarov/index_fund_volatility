@@ -1,18 +1,22 @@
 # 1. Overview
 
-In this project, I use Temporal Fusion Transformer (TFT) to forecast 10-day volatility of 7 tech stocks:
+In this project, I use Temporal Fusion Transformer (TFT) to forecast 10-day volatility of 7 sector-specific ETFs:
 
- - Adobe (ADBE)
- - Alphabet (GOOGL)
- - Amazon (AMZN)
- - Apple (AAPL)
- - Microsoft (MSFT)
- - Netflix (NFLX)
- - Nvidia (NVDA)
+ - XLK - Technology
+ - XLP - Consumer Staples
+ - XLF - Financial
+ - XLV - Health Care
+ - XLE - Energy
+ - XLI - Industrial
+ - XLU - Utilities
 
- One of the key features of TFT architecture is the ability to output prediction *intervals*, by using Quantile Loss function. The model was trained to provide 3 quantile results - P10, P50, and P90. Another important feature of TFT is to output multi-horizon forecast. For this project, the model was trained to predict 10-day ahead volatility.
+Given the limited availability of high-frequency data (e.g. 5-min data), I opted to forecast **5-day Historical Volatility** which is defined as the standard deviation of daily returns across 5 days. More concretely, given the inputs X<sub>t-n</sub> to X <sub>t</sub>, the model predicts Y <sub>t+1</sub> to Y<sub>t+10</sub>
 
- The model can be accessed via an API deployed on AWS Elastic Beanstalk using the following [link](http://pytorch-final-env.eba-zbppsjpu.us-east-1.elasticbeanstalk.com/predict). Due to the size of the model and the necessary imports, the API is deployed on t2.medium instance. So, don't use it too often, or you will make me go broke :(
+
+One of the key features of TFT architecture is the ability to output prediction *intervals*, by using Quantile Loss function. The model was trained to provide 3 quantile results - P10, P50, and P90. Another important feature of TFT is to output multi-horizon forecast. For this project, the model was trained to predict 10-day ahead volatility.
+
+
+The model can be accessed via an API deployed on AWS Elastic Beanstalk using the following [link](http://pytorch-final-env.eba-zbppsjpu.us-east-1.elasticbeanstalk.com/predict). Due to the size of the model and the necessary imports, the API is deployed on t2.medium instance.
 
  ## 2. Data Source
 
